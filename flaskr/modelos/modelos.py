@@ -37,5 +37,13 @@ class OfertaSchema(SQLAlchemySchema):
     titulo = fields.String()
     descripcion = fields.String()
     lenguajes = fields.String()
+
+class EmpresaSchema(SQLAlchemySchema):
+    class Meta:
+        model = Empresa
+        include_relationships = True
+        load_instance = True
+    id = fields.Integer()
+    nombre = fields.String()
     
 
