@@ -2,7 +2,7 @@ from flaskr import create_app
 from .modelos import db, Empresa, Oferta
 from .modelos import OfertaSchema
 from flask_restful import Api
-from .vistas import VistaOfertas, VistaOferta, VistaEmpresa, VistaOfertasEmpresa
+from .vistas import VistaEmpresa, VistaOfertasEmpresa
 
 app = create_app('default')
 app_context = app.app_context()
@@ -30,7 +30,7 @@ db.create_all()
 
     # prueba de serialización de la base de datos--------------------------------------------------------------------
     # oferta_schema = OfertaSchema()
-    # O = Oferta( titulo='Oferta2', descripcion='Descipcon de la oferta labolar', lenguajes='Java')
+    # O = Oferta( titulo='Oferta2', descripcion='Descipcon de la oferta labolar', lenguajes='Java', empresa=1)
     # db.session.add(O)
     # db.session.commit()
     # print([oferta_schema.dump(oferta) for oferta in Oferta.query.all()])
@@ -38,7 +38,6 @@ db.create_all()
 #  api---------------------------------
 
 api = Api(app)
-api.add_resource(VistaOfertas, '/ofertas')
-api.add_resource(VistaOferta, '/oferta/<int:id_oferta>')
+# api.add_resource(VistaOfertas, '/ofertas')
 api.add_resource(VistaEmpresa, '/empresa')
-api.add_resource(VistaOfertasEmpresa, '/ofertasempresa/<int:id_empresa>')
+api.add_resource(VistaOfertasEmpresa, '/ofertasempresa')
