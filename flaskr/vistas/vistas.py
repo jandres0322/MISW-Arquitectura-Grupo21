@@ -1,20 +1,14 @@
 from flask_restful import Resource
-from ..modelos import db, Oferta, OfertaSchema, Empresa, EmpresaSchema
+from ..modelos import db, Oferta, OfertaSchema
 from flask import request
-from sqlalchemy.exc import IntegrityError
 from datetime import datetime
-from celery import Celery
-
-celery_app = Celery(__name__, broker="redis://localhost:6379/0")
-
-@celery_app.task(name="registrar_log")
-def registrar_log(*args):
-    pass
+import pika
+import json
+import redis
 
 import traceback
-
+redis_client=redis.StrictRedis(host="localhost", port=6379,db=0)
 oferta_schema = OfertaSchema()
-empresa_Schema = EmpresaSchema()
 
     
 class VistaOfertas(Resource):
@@ -33,12 +27,12 @@ class VistaOfertas(Resource):
                 lenguajes=lenguajes,
                 empresa=empresa
             )
-            args = (titulo, datetime.utcnow())
-            registrar_log.apply_async(args=args, queue="logs")
             db.session.add(nueva_oferta)
             db.session.commit()
+            channel.basic_publish(exchange='', routing_key='monitor', body='Información guardada')
             return oferta_schema.dump(nueva_oferta), 201
 
         except Exception as e:
             db.session.rollback()
+            traceback.print_exc()
             return {"message": "Error al crear la oferta: {}".format(str(e))}, 500  

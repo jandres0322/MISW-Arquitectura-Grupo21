@@ -1,6 +1,5 @@
 from flaskr import create_app
-from .modelos import db, Empresa, Oferta
-from .modelos import OfertaSchema
+from .modelos import db
 from flask_restful import Api
 from .vistas import VistaOfertas
 

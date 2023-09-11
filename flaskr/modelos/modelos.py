@@ -17,11 +17,12 @@ class Oferta(db.Model):
 class OfertaSchema(SQLAlchemySchema):
     class Meta:
         model = Oferta
-        include_relationships = True
         load_instance = True
+
     id = fields.Integer()
     titulo = fields.String()
     descripcion = fields.String()
     lenguajes = fields.String()
+    empresa = fields.String()
 
 
