@@ -12,14 +12,14 @@ RABBITMQ_QUEUE = os.environ.get('RABBITMQ_QUEUE')
 RABBITMQ_USER = os.environ.get('RABBITMQ_USER')
 RABBITMQ_PASS = os.environ.get('RABBITMQ_PASS')
 
-@app.route('/curso', methods=['POST'])
+@app.route('/empresa', methods=['POST'])
 def send_message():
     try:
         data = request.get_json()
         if not data:
             return jsonify(error='Message missing in request body'), 400
 
-        create_curso(data)
+        create_empresa(data)
 
         return jsonify(message='Message sent to RabbitMQ successfully')
     except Exception as e:
