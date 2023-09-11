@@ -4,29 +4,15 @@ from marshmallow import fields
 
 db = SQLAlchemy()
 
-class Empresa(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    nombre = db.Column(db.String(128))
-    ofertas = db.relationship('Oferta', cascade='all, delete, delete-orphan')
-
-    def __repr__(self):
-        return "{}".format(self.nombre)
-
 class Oferta(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     titulo = db.Column(db.String(128))
     descripcion = db.Column(db.String(128))
     lenguajes = db.Column(db.String(128))
-    empresa = db.Column(db.Integer, db.ForeignKey(Empresa.id))
+    empresa = db.Column(db.String(128))
 
     def __repr__(self):
         return "{}-{}-{}-{}".format(self.titulo, self.descripcion, self.lenguajes, self.empresa)
-    
-class EnumADiccionario(fields.Field):
-    def _serialize(self, value, attr, obj, **kwargs):
-        if value is None:
-            return None
-        return {"llave": value.name, "valor": value.value}
 
 class OfertaSchema(SQLAlchemySchema):
     class Meta:
@@ -38,12 +24,4 @@ class OfertaSchema(SQLAlchemySchema):
     descripcion = fields.String()
     lenguajes = fields.String()
 
-class EmpresaSchema(SQLAlchemySchema):
-    class Meta:
-        model = Empresa
-        include_relationships = True
-        load_instance = True
-    id = fields.Integer()
-    nombre = fields.String()
-    
 

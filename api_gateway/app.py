@@ -17,7 +17,6 @@ def send_message_oferta():
         data = request.get_json()
         if not data:
             return jsonify(error='Message missing in request body'), 400
-
         try:
             connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=RABBITMQ_HOST,
