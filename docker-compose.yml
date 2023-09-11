@@ -16,7 +16,7 @@ services:
       - "5001:5001"
     environment:
       - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_QUEUE=queue_cursos
+      - RABBITMQ_QUEUE=queue_ofertas
       - RABBITMQ_USER=testing
       - RABBITMQ_PASS=123456
     depends_on:
