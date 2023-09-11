@@ -27,7 +27,7 @@ class VistaEmpresa(Resource):
         empresa = Empresa.query.get_or_404(id_empresa)
         db.session.delete(empresa)
         db.session.commit()
-        return '',204
+        return 'Operacion exitosa',204
     
 class VistaOfertasEmpresa(Resource):
     def get(self):
