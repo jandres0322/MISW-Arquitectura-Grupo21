@@ -1,7 +1,6 @@
-FROM python:3
-RUN mkdir /autorizador
-WORKDIR /autorizador
-ADD requirements.txt /autorizador/
+FROM python:3.8
+WORKDIR /app
+COPY . /app
 RUN pip install -r requirements.txt
-ADD * /autorizador/
-EXPOSE 5000
+EXPOSE 5002
+CMD ["python", "app.py"]

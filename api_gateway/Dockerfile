@@ -1,7 +1,6 @@
-FROM python:3
-RUN mkdir /api
-WORKDIR /api
-ADD requirements.txt /api/
+FROM python:3.8
+WORKDIR /app
+COPY . /app
 RUN pip install -r requirements.txt
-ADD * /api/
-EXPOSE 5000
+EXPOSE 5001
+CMD ["python", "app.py"]
