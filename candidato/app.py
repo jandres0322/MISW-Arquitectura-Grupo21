@@ -1,20 +1,26 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_mashmallow import Marshmallow
+#from flask_mashmallow import Marshmallow
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from flask_restful import Api, Resource
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required
+from flask_migrate import Migrate
+import os
 
 
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////mnt/usuarios.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///candidatos.sqlite'
 db = SQLAlchemy(app)
-ma = Marshmallow(app)
+#ma = Marshmallow(app)
 app.config['JWT_SECRET_KEY'] = "secret-jwt"
 app.config['JWT_ACCESS_TOKEN_EXPIRED'] = False
+with app.app_context():
+    db.create_all()
 
+migrate = Migrate(app,db)
 JWT = JWTManager(app)
 api = Api(app)
 
@@ -26,7 +32,7 @@ class Candidato(db.Model):
 
 
 
-class CandidatoSchema(ma.SQLAlchemyAutoSchema):
+class CandidatoSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Candidato
         fields = ('id','nombre','username','password')
@@ -36,12 +42,12 @@ candidatos_schema = CandidatoSchema(many=True)
 
 
 class CandidatoListResource(Resource):
-    @jwt_required()
+    #@jwt_required()
     def get(self):
-        candidatos = candidato.query.all()
+        candidatos = Candidato.query.all()
         return candidatos_schema.dump(candidatos)
 
-    @jwt_required()
+    #@jwt_required()
     def post(self):
         nuevo_candidato = Candidato(
             nombre = request.json['nombre'],
@@ -55,7 +61,7 @@ class CandidatoListResource(Resource):
 
 
 class CandidatoResource(Resource):
-    @jwt_required()
+    #@jwt_required()
     def get(self,candidatoId):
         candidato = Candidato.query.get_or_404(candidatoId)
         return candidatos_schema.dump(candidato)
@@ -64,6 +70,8 @@ class CandidatoResource(Resource):
 api.add_resource(CandidatoListResource, '/candidatos')
 api.add_resource(CandidatoResource, '/candidatos/<int:candidatoId>')
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', ssl_context='adhoc')
+#if __name__ == '__main__':
+    #app.run(debug=True, host='0.0.0.0', ssl_context='adhoc')
 
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5003)))
