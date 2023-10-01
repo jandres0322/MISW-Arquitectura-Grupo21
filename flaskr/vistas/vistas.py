@@ -10,6 +10,29 @@ import traceback
 redis_client=redis.StrictRedis(host="localhost", port=6379,db=0)
 oferta_schema = OfertaSchema()
 
+<<<<<<< HEAD
+=======
+class VistaEmpresa(Resource):   
+    def get(self):
+        return [empresa_Schema.dump(empresa) for empresa in Empresa.query.all()]
+     
+    def post(self):
+        nuevo_usuario = Empresa(nombre=request.json["nombre"])
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+        return 'Empresa creada exitosamente', 201
+
+    def put(self, id_empresa):
+        empresa = Empresa.query.get_or_404(id_empresa)
+        db.session.commit()
+        return empresa_Schema.dump(empresa)
+
+    def delete(self, id_empresa):
+        empresa = Empresa.query.get_or_404(id_empresa)
+        db.session.delete(empresa)
+        db.session.commit()
+        return 'Operacion exitosa',204
+>>>>>>> exp-2
     
 class VistaOfertas(Resource):
     def get(self):
