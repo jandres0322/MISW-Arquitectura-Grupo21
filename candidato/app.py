@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager
 from flask_jwt_extended import jwt_required
 from flask_migrate import Migrate
 import os
+import hashlib
 
 
 
@@ -37,7 +38,7 @@ class CandidatoSchema(SQLAlchemyAutoSchema):
         model = Candidato
         fields = ('id','nombre','username','password')
 
-candito_schema = CandidatoSchema()
+candidato_schema = CandidatoSchema()
 candidatos_schema = CandidatoSchema(many=True)
 
 
@@ -49,26 +50,41 @@ class CandidatoListResource(Resource):
 
     #@jwt_required()
     def post(self):
+        nombre = request.json.get("nombre")
+        username = request.json.get("username")
+        password = request.json.get("password")
+
+        salt = os.urandom(32)
+        password_bytes = password.encode("utf-8")
+        salted_password = salt + password_bytes
+        hashed_password = hashlib.sha256(salted_password).hexdigest()
+
         nuevo_candidato = Candidato(
-            nombre = request.json['nombre'],
-            username = request.json['username'],
-            password = request.json['password']
+            nombre=nombre,
+            username=username,
+            password=hashed_password
         )
         db.session.add(nuevo_candidato)
         db.session.commit()
-        return candidatos_schema.dump(nuevo_candidato)
+        return candidato_schema.dump(nuevo_candidato)
 
 
 
 class CandidatoResource(Resource):
     #@jwt_required()
-    def get(self,candidatoId):
-        candidato = Candidato.query.get_or_404(candidatoId)
-        return candidatos_schema.dump(candidato)
+    def get(self, username):
+        candidato = Candidato.query.filter_by(username = username).first()
+        if candidato:
+            return candidatos_schema.dump(candidato)
+        else :
+            return 'candidato no encontrado', 404
+
+
+
 
 
 api.add_resource(CandidatoListResource, '/candidatos')
-api.add_resource(CandidatoResource, '/candidatos/<int:candidatoId>')
+api.add_resource(CandidatoResource, '/candidatos/<string:username>')
 
 #if __name__ == '__main__':
     #app.run(debug=True, host='0.0.0.0', ssl_context='adhoc')
