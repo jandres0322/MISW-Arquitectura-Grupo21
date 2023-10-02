@@ -35,23 +35,16 @@ def verificar_token(f):
 
 @app.route("/api/candidato/login", methods=["POST"])
 def login_candidato():
-    print("===== INIT API GATEWAY LOGIN CANDIDATO /api/candidato/login =======")
-    ## Extraer información del cliente
     bodyRequest = request.json
-    ## Validar información del candidato
     username = bodyRequest["username"]
-    # response_candidato = requests.get(
-    #     f"{HOST_CANDIDATOS}/candidatos/${username}"
-    # )
-    ## Generar token de autenticación
+    response_candidato = requests.get(
+        f"{HOST_CANDIDATOS}/candidatos/{username}"
+    )
+    print("response_candidato -->", response_candidato.json() )
     response_auth = requests.post(
         f"{HOST_AUTH}/auth/candidato",
-        json={
-            "username": bodyRequest["username"],
-            "password": bodyRequest["password"]
-        }
+        json=response_candidato.json()
     )
-    ## Retornar token de autenticación
     response_auth_json = response_auth.json()
     return {
         "token": response_auth_json["token"]
@@ -60,19 +53,14 @@ def login_candidato():
 @app.route("/api/ofertas/listar", methods=["GET"])
 @verificar_token
 def obtener_ofertas():
-    bodyRequest = request.json
-    id_ofertas = bodyRequest["ofertas"]
-    if id_ofertas is None or len(id_ofertas) == 0:
-        return {
-            "mensaje": "El candidato no tiene ofertas"
-        }, 404
+    candidato = request.current_user
     response_ofertas = requests.get(
         f"{HOST_OFERTAS}/ofertas",
         json={
-            "ofertas":id_ofertas
+            "candidato":candidato["id"]
         }
     )
-    ofertas = response_ofertas.json["ofertas"]
+    ofertas = response_ofertas.json()
     return {
         "mensaje": "Ofertas encontradas exitosamente",
         "ofertas": ofertas
@@ -81,10 +69,16 @@ def obtener_ofertas():
 @app.route("/api/ofertas/cambiar-estado/<id_oferta>", methods=["PUT"])
 @verificar_token
 def cambiar_estado_oferta(id_oferta):
-    return {
-        "message": "ENDPOINT Modificar Oferta",
-        "id_oferta": id_oferta
-    }
+    bodyRequest = request.json
+    response_oferta = requests.put(
+        f"{HOST_OFERTAS}/ofertas/cambiar-estado/{id_oferta}",
+        json=bodyRequest
+    )
+    status_code = response_oferta.status_code
+    if status_code == 200:
+        return {
+            "mensaje": "Estado de la oferta cambiado exitosamente",
+        }
 
 
 if __name__ == "__main__":

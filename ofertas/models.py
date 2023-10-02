@@ -13,4 +13,4 @@ class Order(db.Model):
 
 class OrderSchema(SQLAlchemyAutoSchema):
     class Meta:
-        fields = ("id", "empresa", "titulo", "estado")
+        fields = ("id", "empresa", "titulo", "estado", "candidato")

@@ -75,7 +75,7 @@ class CandidatoResource(Resource):
     def get(self, username):
         candidato = Candidato.query.filter_by(username = username).first()
         if candidato:
-            return candidatos_schema.dump(candidato)
+            return candidato_schema.dump(candidato)
         else :
             return 'candidato no encontrado', 404
 

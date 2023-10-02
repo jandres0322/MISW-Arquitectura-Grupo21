@@ -1,4 +1,3 @@
-import requests
 from flask import Flask, request
 from flask_restful import Api, Resource
 from models import db, OrderSchema, Order
@@ -24,7 +23,8 @@ ofertas_schema = OrderSchema(many=True)
 
 class OfertaListResource(Resource):
     def get(self):
-        orders = Order.query.all()
+        candidato = request.json["candidato"]
+        orders = Order.query.filter_by(candidato = candidato).all()
         return ofertas_schema.dump(orders)
 
     def post(self):
@@ -43,6 +43,7 @@ class OfertaResource(Resource):
 
     def put(self, oferta_id):
         offer = Order.query.get_or_404(oferta_id)
+        print("request.json", request.json)
         new_estado = request.json.get('estado')
 
         if new_estado is not None:
