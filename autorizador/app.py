@@ -6,7 +6,7 @@ import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("JWT_SECRET", "JF}]&p1CH4-?-k]")
-app.config['JWT_TIME_EXPIRE'] = int(os.environ.get("JWT_EXPIRE_SECONDS", 30))
+app.config['JWT_TIME_EXPIRE'] = int(os.environ.get("JWT_EXPIRE_SECONDS", 120))
 
 
 @app.route("/auth/candidato", methods=["POST"])

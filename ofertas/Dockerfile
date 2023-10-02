@@ -1,7 +1,6 @@
-FROM python:3
-RUN mkdir /oferta
-WORKDIR /oferta
-ADD requirements.txt /oferta/
+FROM python:3.8
+WORKDIR /app
+COPY . /app
 RUN pip install -r requirements.txt
-ADD * /oferta/
-EXPOSE 5000
+EXPOSE 5004
+CMD ["python", "app.py"]
