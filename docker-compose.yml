@@ -19,3 +19,10 @@ services:
       - PORT=5004
       - JWT_SECRET=JF}]&p1CH4-?-k]
       - JWT_EXPIRE_SECONDS=30
+  candidatos:
+    build:
+      context: ./candidato
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
