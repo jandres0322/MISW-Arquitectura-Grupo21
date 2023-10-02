@@ -4,15 +4,25 @@ services:
     build:
       context: ./api_gateway
     ports:
-      - "5002:5002"
+      - "5001:5001"
     environment:
       - HOST_CANDIDATO=http://candidatos:5003
       - HOST_AUTH=http://autorizador:5004
-      - PORT=5002
+      - HOST_CANDIDATOS=http://candidatos:5003
+      - PORT=5001
       - JWT_SECRET=JF}]&p1CH4-?-k]
   autorizador:
     build:
       context: ./autorizador
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - JWT_SECRET=JF}]&p1CH4-?-k]
+      - JWT_EXPIRE_SECONDS=30
+  ofertas:
+    build:
+      context: ./ofertas
     ports:
       - "5004:5004"
     environment:

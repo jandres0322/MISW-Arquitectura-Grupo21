@@ -6,15 +6,18 @@ import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("JWT_SECRET", "JF}]&p1CH4-?-k]")
-app.config['JWT_TIME_EXPIRE'] = int(os.environ.get("JWT_EXPIRE_SECONDS", 30))
+app.config['JWT_TIME_EXPIRE'] = int(os.environ.get("JWT_EXPIRE_SECONDS", 120))
 
 
 @app.route("/auth/candidato", methods=["POST"])
 def autenticar_candidato():
-    print("===== INIT AUTORIZADOR /auth/candidato =======")
+    id = request.json["id"]
     username = request.json["username"]
+    password = request.json["password"]
     payload = {
+      "id": id, 
       "username": username,
+      "password": password, 
       'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=app.config['JWT_TIME_EXPIRE'])
     }
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm="HS256")

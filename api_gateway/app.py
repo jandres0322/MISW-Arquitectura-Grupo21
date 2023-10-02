@@ -9,8 +9,9 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("JWT_SECRET", "JF}]&p1CH4-?-k]")
 
 
-HOST_CANDIDATO = os.environ.get("HOST_CANDIDATO", "http://localhost:5002")
-HOST_AUTH = os.environ.get("HOST_AUTH", "http://localhost:5004")
+HOST_AUTH = os.environ.get("HOST_AUTH", "http://localhost:5002")
+HOST_CANDIDATOS = os.environ.get("HOST_CANDIDATOS", "http://localhost:5003")
+HOST_OFERTAS = os.environ.get("HOST_OFERTAS", "http://localhost:5004")
 
 
 def verificar_token(f):
@@ -26,9 +27,7 @@ def verificar_token(f):
             return jsonify({'message': 'Token expirado'}), 401
         except jwt.InvalidTokenError:
             return jsonify({'message': 'Token inválido'}), 401
-
         request.current_user = payload
-
         return f(*args, **kwargs)
 
     return decorator
@@ -36,40 +35,51 @@ def verificar_token(f):
 
 @app.route("/api/candidato/login", methods=["POST"])
 def login_candidato():
-    print("===== INIT API GATEWAY /api/candidato/login =======")
     bodyRequest = request.json
-    print(bodyRequest)
-    # response_candidato = requests.post(
-    #    f"{HOST_CANDIDATO}/candidato",
-    #    json=bodyRequest
-    # )
-    # print(response_candidato)
-    response_generar_token = requests.post(
-        f"{HOST_AUTH}/auth/candidato",
-        json={
-            "username": bodyRequest["username"]
-        }
+    username = bodyRequest["username"]
+    response_candidato = requests.get(
+        f"{HOST_CANDIDATOS}/candidatos/{username}"
     )
-    response_generar_token_json = response_generar_token.json()
+    print("response_candidato -->", response_candidato.json() )
+    response_auth = requests.post(
+        f"{HOST_AUTH}/auth/candidato",
+        json=response_candidato.json()
+    )
+    response_auth_json = response_auth.json()
     return {
-        "token": response_generar_token_json["token"]
+        "token": response_auth_json["token"]
     }, 200
 
-@app.route("/api/ofertas", methods=["GET"])
+@app.route("/api/ofertas/listar", methods=["GET"])
 @verificar_token
 def obtener_ofertas():
+    candidato = request.current_user
+    response_ofertas = requests.get(
+        f"{HOST_OFERTAS}/ofertas",
+        json={
+            "candidato":candidato["id"]
+        }
+    )
+    ofertas = response_ofertas.json()
     return {
-        "message": "ENDPOINT Ver Ofertas"
-    }
+        "mensaje": "Ofertas encontradas exitosamente",
+        "ofertas": ofertas
+    }, 200
 
-@app.route("/api/ofertas/<id_oferta>", methods=["PUT"])
+@app.route("/api/ofertas/cambiar-estado/<id_oferta>", methods=["PUT"])
 @verificar_token
-def modificar_estado_oferta(id_oferta):
-    return {
-        "message": "ENDPOINT Modificar Oferta",
-        "id_oferta": id_oferta
-    }
+def cambiar_estado_oferta(id_oferta):
+    bodyRequest = request.json
+    response_oferta = requests.put(
+        f"{HOST_OFERTAS}/ofertas/cambiar-estado/{id_oferta}",
+        json=bodyRequest
+    )
+    status_code = response_oferta.status_code
+    if status_code == 200:
+        return {
+            "mensaje": "Estado de la oferta cambiado exitosamente",
+        }
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5002)))
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5001)))
